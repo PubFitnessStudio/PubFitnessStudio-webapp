@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Layout from "../components/Layout";
 import { format, addDays, subDays } from "date-fns";
 
-
 const getUserData = (date: string) => {
   const username = localStorage.getItem("username");
   
@@ -58,9 +57,17 @@ const getUserData = (date: string) => {
   });
 };
 
+const defaultUserData = {
+  caloriesGoal: 2500,
+  proteinsGoal: 150,
+  fatsGoal: 70,
+  carbsGoal: 250,
+  weight: 70,
+  height: 172
+};
 
-const userData = JSON.parse(localStorage.getItem("userProfile"));
-const { caloriesGoal, proteinsGoal, fatsGoal, carbsGoal } = userData;
+const userData = JSON.parse(localStorage.getItem("userProfile")) || defaultUserData;
+const { caloriesGoal, proteinsGoal, fatsGoal, carbsGoal, weight, height } = userData;
 
 let nutritionData = {
   calories: 0,
@@ -69,13 +76,13 @@ let nutritionData = {
   carbs: 0,
   water: 0,
   bmi: 0,
-  caloriesGoal: caloriesGoal,
-  proteinsGoal: proteinsGoal,
-  carbsGoal: fatsGoal,
-  fatsGoal: carbsGoal,
+  caloriesGoal,
+  proteinsGoal,
+  carbsGoal,
+  fatsGoal,
 };
 
-nutritionData['bmi'] = userData.weight / ((userData.height * userData.height) / 10000);
+nutritionData['bmi'] = weight / ((height * height) / 10000);
 
 const Index = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
