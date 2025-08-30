@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from db_utils import create_tables, login, register, contact_admin, get_pending_registrations, approve_registration, reject_registration, get_dashboard_statistics, get_all_users, get_user_goals_from_db, get_nutrition_data_from_db, save_nutrition_data_to_db, get_user_profile_from_db, update_user_profile_to_db, update_user_goals_to_db, update_profile_image_to_db, update_user_details_in_db, update_user_password_in_db
+from db_utils import create_tables, login, register, contact_admin, get_pending_registrations, approve_registration, reject_registration, get_dashboard_statistics, get_all_users, get_user_goals_from_db, get_nutrition_data_from_db, save_nutrition_data_to_db, get_user_profile_from_db, update_user_profile_to_db, update_user_goals_to_db, update_profile_image_to_db, update_user_details_in_db, update_user_password_in_db, delete_user_from_db
 from auth_utils import generate_token, decode_token
 
 from flask import Flask, request, jsonify, render_template, redirect, url_for
@@ -12,6 +12,7 @@ import os
 import asyncio
 
 create_tables()
+
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -63,9 +64,30 @@ def contact_admin_page():
 @app.route("/api/register", methods=["POST"])
 @admin_required
 def register_route():
-    data = request.get_json()
-    result = asyncio.run(register(data))
-    return jsonify(result)
+    try:
+        # Check if the request contains files (multipart/form-data)
+        if request.files:
+            # Handle multipart form data with image
+            data = {}
+            for key in request.form:
+                if key in ['calories_goal', 'proteins_goal', 'fats_goal', 'carbs_goal']:
+                    data[key] = int(request.form[key]) if request.form[key] else None
+                else:
+                    data[key] = request.form[key] if request.form[key] else None
+            
+            # Handle profile image
+            if 'profile_image' in request.files:
+                profile_file = request.files['profile_image']
+                if profile_file.filename != '':
+                    data['profile_image'] = profile_file
+        else:
+            # Handle JSON data
+            data = request.get_json()
+        
+        result = asyncio.run(register(data))
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"status": "failure", "error": str(e)}), 500
 
 @app.route("/api/login", methods=["POST"])
 def login_route():
@@ -141,6 +163,17 @@ def calculator_page():
 @app.route("/update-user-details")
 def update_user_details():
     return render_template("update_user_details.html")
+
+@app.route("/api/delete-user", methods=["POST"])
+@admin_required
+def delete_user():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({"status": "failure", "message": "User ID is required"}), 400
+    
+    result = asyncio.run(delete_user_from_db(user_id))
+    return jsonify(result)
 
 @app.route("/logout")
 def logout():
@@ -295,5 +328,15 @@ def update_user_details_api():
         print(e)
         return jsonify({"status": "failure", "message": str(e)}), 500
 
-if __name__ == "__main__":
-    app.run(debug=True)
+
+if __name__ == '__main__':
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    # from waitress import serve
+
+    # if not os.path.exists(DB_PATH):
+    #     create_tables()
+    # serve(app, host='0.0.0.0', port=5000)
+
+    app.run(port=5000, debug=True)

@@ -8,10 +8,14 @@
             <div class="relative">
                 <img id="profile-image" src="/static/default-avatar.svg" alt="Profile" 
                      class="w-24 h-24 rounded-full object-cover border-4 border-blue-200">
-                <label for="image-upload" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 transition-colors">
+                <!-- Image upload disabled for regular users -->
+                <div class="absolute bottom-0 right-0 bg-gray-400 text-white p-2 rounded-full cursor-not-allowed opacity-75">
                     <i data-feather="camera" class="w-4 h-4"></i>
-                </label>
-                <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                </div>
+                <input type="file" id="image-upload" accept="image/*" class="hidden" disabled>
+                <div class="absolute -bottom-8 left-0 text-xs text-gray-500">
+                    Profile image updates are managed by administrators
+                </div>
             </div>
             <div>
                 <h2 class="text-2xl font-bold text-gray-800" id="profile-username">Loading...</h2>
@@ -29,7 +33,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
                     <input type="text" id="username" name="username" 
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" disabled>
                 </div>
                 
                 <div>
@@ -148,6 +152,70 @@
             </div>
         </form>
     </div>
+
+    <!-- BMI Report Card Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Health Metrics Report</h3>
+        <p class="text-gray-600 mb-4">Your health metrics calculated from your profile information.</p>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Metric</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Value</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Unit</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-3 font-medium text-blue-600">BMI</td>
+                        <td class="border border-gray-300 px-4 py-3" id="bmi-value">--</td>
+                        <td class="border border-gray-300 px-4 py-3 text-gray-600">kg/m²</td>
+                        <td class="border border-gray-300 px-4 py-3 text-sm text-gray-600">Body Mass Index</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-3 font-medium text-green-600">TBW</td>
+                        <td class="border border-gray-300 px-4 py-3" id="tbw-value">--</td>
+                        <td class="border border-gray-300 px-4 py-3 text-gray-600">L</td>
+                        <td class="border border-gray-300 px-4 py-3 text-sm text-gray-600">Total Body Water</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-3 font-medium text-purple-600">BMC</td>
+                        <td class="border border-gray-300 px-4 py-3" id="bmc-value">--</td>
+                        <td class="border border-gray-300 px-4 py-3 text-gray-600">kg</td>
+                        <td class="border border-gray-300 px-4 py-3 text-sm text-gray-600">Bone Mineral Content</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-3 font-medium text-orange-600">BMR</td>
+                        <td class="border border-gray-300 px-4 py-3" id="bmr-value">--</td>
+                        <td class="border border-gray-300 px-4 py-3 text-gray-600">kcal/day</td>
+                        <td class="border border-gray-300 px-4 py-3 text-sm text-gray-600">Basal Metabolic Rate</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-3 font-medium text-red-600">Body Fat</td>
+                        <td class="border border-gray-300 px-4 py-3" id="fat-value">--</td>
+                        <td class="border border-gray-300 px-4 py-3 text-gray-600">%</td>
+                        <td class="border border-gray-300 px-4 py-3 text-sm text-gray-600">Body Fat Percentage</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-3 font-medium text-indigo-600">Muscle Mass</td>
+                        <td class="border border-gray-300 px-4 py-3" id="pm-value">--</td>
+                        <td class="border border-gray-300 px-4 py-3 text-gray-600">kg</td>
+                        <td class="border border-gray-300 px-4 py-3 text-sm text-gray-600">Predicted Muscle Mass</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-800">
+                <strong>Note:</strong> These calculations are estimates based on standard formulas. 
+                For accurate measurements, consult with healthcare professionals.
+            </p>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -173,6 +241,7 @@ async function loadUserProfile() {
             userData = data.user;
             populateProfileForm();
             updateProfileDisplay();
+            calculateHealthMetrics(); // Call calculateHealthMetrics after loading profile
         }
     } catch (error) {
         console.error('Error loading user profile:', error);
@@ -239,6 +308,7 @@ async function handlePersonalUpdate(event) {
         if (response.ok) {
             alert('Personal information updated successfully!');
             loadUserProfile(); // Reload to get updated data
+            calculateHealthMetrics(); // Recalculate metrics after personal update
         } else {
             const error = await response.json();
             alert(`Error updating profile: ${error.message}`);
@@ -337,7 +407,8 @@ async function handlePasswordUpdate(event) {
     }
 }
 
-// Handle image upload
+// Handle image upload (disabled for regular users)
+/*
 async function handleImageUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -376,6 +447,103 @@ async function handleImageUpload(event) {
     } catch (error) {
         console.error('Error updating image:', error);
         alert('Error updating image. Please try again.');
+    }
+}
+*/
+
+// Calculate health metrics based on user data
+function calculateHealthMetrics() {
+    const weight = parseFloat(userData.weight);
+    const height = parseInt(userData.height);
+    const gender = userData.gender;
+    const dob = userData.dob;
+    
+    // Check if we have the required data
+    if (!weight || !height || !gender || !dob) {
+        // Hide the report section if data is incomplete
+        const reportSection = document.querySelector('.bg-white.rounded-lg.shadow-md.p-6:last-child');
+        if (reportSection) {
+            reportSection.style.display = 'none';
+        }
+        return;
+    }
+    
+    // Show the report section if it was hidden
+    const reportSection = document.querySelector('.bg-white.rounded-lg.shadow-md.p-6:last-child');
+    if (reportSection) {
+        reportSection.style.display = 'block';
+    }
+    
+    // Calculate age from date of birth
+    const birthDate = new Date(dob);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const adjustedAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+    
+    // Calculate health metrics using the provided formulas
+    const bmiValue = weight / (height * height / 10000); // kg/m²
+    const tbwValue = 0.6 * weight; // L
+    const bmcValue = 0.04 * weight; // kg
+    
+    let bmrValue, fatValue, pmValue;
+    
+    if (gender === "male") {
+        bmrValue = (10 * weight) + (6.25 * height) - (5 * adjustedAge) + 5;
+        fatValue = (1.2 * bmiValue) + (0.23 * adjustedAge) - 10.8 - 5.4;
+        pmValue = 0.2 * (weight * (1 - fatValue / 100));
+    } else {
+        bmrValue = (10 * weight) + (6.25 * height) - (5 * adjustedAge) - 161;
+        fatValue = (1.2 * bmiValue) + (0.23 * adjustedAge) - 5.4;
+        pmValue = 0.2 * (weight * (1 - fatValue / 100));
+    }
+    
+    // Update the table with calculated values
+    document.getElementById('bmi-value').textContent = bmiValue.toFixed(1);
+    document.getElementById('tbw-value').textContent = tbwValue.toFixed(1);
+    document.getElementById('bmc-value').textContent = bmcValue.toFixed(2);
+    document.getElementById('bmr-value').textContent = Math.round(bmrValue);
+    document.getElementById('fat-value').textContent = fatValue.toFixed(1);
+    document.getElementById('pm-value').textContent = pmValue.toFixed(1);
+    
+    // Add color coding for BMI
+    const bmiCell = document.getElementById('bmi-value');
+    bmiCell.className = 'border border-gray-300 px-4 py-3 font-semibold';
+    
+    if (bmiValue < 18.5) {
+        bmiCell.classList.add('text-blue-600'); // Underweight
+    } else if (bmiValue >= 18.5 && bmiValue < 25) {
+        bmiCell.classList.add('text-green-600'); // Normal weight
+    } else if (bmiValue >= 25 && bmiValue < 30) {
+        bmiCell.classList.add('text-orange-600'); // Overweight
+    } else {
+        bmiCell.classList.add('text-red-600'); // Obese
+    }
+    
+    // Add color coding for body fat percentage
+    const fatCell = document.getElementById('fat-value');
+    fatCell.className = 'border border-gray-300 px-4 py-3 font-semibold';
+    
+    if (gender === "male") {
+        if (fatValue < 10) {
+            fatCell.classList.add('text-blue-600'); // Essential fat
+        } else if (fatValue >= 10 && fatValue < 20) {
+            fatCell.classList.add('text-green-600'); // Athletic
+        } else if (fatValue >= 20 && fatValue < 25) {
+            fatCell.classList.add('text-orange-600'); // Fitness
+        } else {
+            fatCell.classList.add('text-red-600'); // Above average
+        }
+    } else {
+        if (fatValue < 18) {
+            fatCell.classList.add('text-blue-600'); // Essential fat
+        } else if (fatValue >= 18 && fatValue < 28) {
+            fatCell.classList.add('text-green-600'); // Athletic
+        } else if (fatValue >= 28 && fatValue < 35) {
+            fatCell.classList.add('text-orange-600'); // Fitness
+        } else {
+            fatCell.classList.add('text-red-600'); // Above average
+        }
     }
 }
 

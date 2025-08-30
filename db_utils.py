@@ -80,14 +80,16 @@ def create_tables():
     """)
 
     # Check if default admin exists, if not create it
-    cursor.execute("SELECT COUNT(*) FROM users WHERE username = 'Admin'")
+    admin_username = os.getenv("ADMIN_USERNAME", "PubFit")
+    admin_password = os.getenv("ADMIN_PASSWORD", "PubFit@123")
+
+    cursor.execute("SELECT COUNT(*) FROM users WHERE username = ?", (admin_username,))
     admin_exists = cursor.fetchone()[0]
     
     if admin_exists == 0:
         # Create default admin user
         admin_id = uuid.uuid4().hex
-        admin_username = os.getenv("ADMIN_USERNAME", "PubFit")
-        admin_password = os.getenv("ADMIN_PASSWORD", "PubFit@123")
+        
         admin_password = bcrypt.hashpw(admin_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
         
         cursor.execute("""
@@ -149,9 +151,11 @@ async def login(username: str, password: str):
         try:
             end_date = datetime.strptime(sub_end_date, "%Y-%m-%d").date()
             days_left = (end_date - datetime.today().date()).days
+            if days_left < 0:
+                days_left = None
         except Exception:
             days_left = None
-
+    print(days_left)
     return {
         "status": "success" if days_left is not None else "failure",
         "reason": "User validated successfully" if days_left is not None else "Subscription Expired",
@@ -175,20 +179,29 @@ async def register(data: dict):
     # Hash password
     hashed_pw = bcrypt.hashpw(validated.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
+    # Handle profile image if provided
+    profile_img = None
+    if hasattr(validated, 'profile_image') and validated.profile_image:
+        try:
+            # Read the file content
+            profile_img = validated.profile_image.read()
+        except Exception as e:
+            return {"status": "failure", "error": f"Error reading profile image: {str(e)}"}
+
     async with aiosqlite.connect(DB_NAME) as db:
         try:
             await db.execute("""
                 INSERT INTO users (
                     user_id, role, username, password, device_id, phone_no, 
                     sub_start_date, sub_end_date, calories_goal, proteins_goal, fats_goal, carbs_goal,
-                    gender, dob, height, weight
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    gender, dob, height, weight, profile_img
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 user_id, role, validated.username, hashed_pw, validated.device_id, validated.phone_no,
                 validated.sub_start_date, validated.sub_end_date,
                 validated.calories_goal, validated.proteins_goal,
                 validated.fats_goal, validated.carbs_goal,
-                validated.gender, validated.dob, validated.height, validated.weight
+                validated.gender, validated.dob, validated.height, validated.weight, profile_img
             ))
             await db.commit()
         except Exception as e:
@@ -723,6 +736,41 @@ async def update_user_details_in_db(data: dict):
                 "message": "User details updated successfully",
                 "temp_password": new_password if reset_password else None
             }
+        except Exception as e:
+            return {"status": "failure", "message": f"Database error: {str(e)}"}
+
+
+async def delete_user_from_db(user_id: str):
+    async with aiosqlite.connect(DB_NAME) as db:
+        try:
+            # First, get user details for confirmation
+            async with db.execute("""
+                SELECT username, role FROM users WHERE user_id = ?
+            """, (user_id,)) as cursor:
+                row = await cursor.fetchone()
+                
+                if not row:
+                    return {"status": "failure", "message": "User not found"}
+                
+                username, role = row
+                
+                # Prevent deletion of admin users
+                if role == 'admin':
+                    return {"status": "failure", "message": "Cannot delete admin users"}
+            
+            # Delete nutrition data first (due to foreign key constraint)
+            await db.execute("DELETE FROM nutrition_data WHERE user_id = ?", (user_id,))
+            
+            # Delete the user
+            await db.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
+            
+            await db.commit()
+            
+            return {
+                "status": "success", 
+                "message": f"User '{username}' and all associated data deleted successfully"
+            }
+            
         except Exception as e:
             return {"status": "failure", "message": f"Database error: {str(e)}"}
 
