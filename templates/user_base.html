@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}User Dashboard{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gray-50 min-h-screen pb-20">
+    <!-- User Header -->
+    <header class="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex justify-between items-center">
+                <div class="text-center flex-1">
+                    <h1 class="text-3xl font-bold mb-2">Welcome to Pub Fitness Studio! 🎉</h1>
+                    <p class="text-lg opacity-90" id="welcome-message">Welcome back!</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <button onclick="logout()" 
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+                        <i data-feather="log-out" class="w-4 h-4"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        {% block content %}
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Dashboard</h2>
+            <p class="text-gray-600">Welcome to your fitness journey! Use the navigation below to explore different features.</p>
+        </div>
+        {% endblock %}
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+        <div class="flex justify-around items-center py-3">
+            <button onclick="navigateTo('home')" class="flex flex-col items-center space-y-1 text-blue-600 hover:text-blue-700 transition-colors">
+                <i data-feather="home" class="w-6 h-6"></i>
+                <span class="text-xs font-medium">Home</span>
+            </button>
+            
+            <button onclick="navigateTo('calculator')" class="flex flex-col items-center space-y-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <i data-feather="bar-chart-2" class="w-6 h-6"></i>
+                <span class="text-xs font-medium">Calculator</span>
+            </button>
+            
+            <button onclick="navigateTo('videos')" class="flex flex-col items-center space-y-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <i data-feather="video" class="w-6 h-6"></i>
+                <span class="text-xs font-medium">Videos</span>
+            </button>
+            
+            <button onclick="navigateTo('profile')" class="flex flex-col items-center space-y-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <i data-feather="user" class="w-6 h-6"></i>
+                <span class="text-xs font-medium">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // Check if user token exists
+        function checkUserAuth() {
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+            
+            // Decode token to get username
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                document.getElementById('welcome-message').textContent = `Welcome back, ${payload.username}!`;
+            } catch (e) {
+                console.error('Invalid token');
+                localStorage.removeItem('userToken');
+                window.location.href = '/login';
+            }
+        }
+
+        function navigateTo(page) {
+            // Handle navigation to different pages
+            switch(page) {
+                case 'home':
+                    window.location.href = '/home';
+                    break;
+                case 'calculator':
+                    window.location.href = '/calculator';
+                    break;
+                case 'videos':
+                    alert('Video library coming soon!');
+                    break;
+                case 'profile':
+                    window.location.href = '/profile';
+                    break;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('userToken');
+            window.location.href = '/login';
+        }
+
+        // Initialize feather icons and check auth on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+            checkUserAuth();
+        });
+    </script>
+</body>
+</html>

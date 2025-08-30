@@ -1,0 +1,578 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Quick Stats -->
+        <div onclick="filterUsers('total')" class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-all border-2 border-transparent hover:border-blue-300" id="total-users-card">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i data-feather="users" class="w-8 h-8"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Total Users</h3>
+                    <p class="text-2xl font-bold text-blue-600" id="total-users-count">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="filterUsers('active')" class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-all border-2 border-transparent hover:border-green-300" id="active-users-card">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i data-feather="user-check" class="w-8 h-8"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Active Users</h3>
+                    <p class="text-2xl font-bold text-green-600" id="active-users-count">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="filterUsers('expiring')" class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-all border-2 border-transparent hover:border-orange-300" id="expiring-users-card">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                    <i data-feather="alert-triangle" class="w-8 h-8"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Expiring Soon</h3>
+                    <p class="text-2xl font-bold text-orange-600" id="expiring-users-count">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="filterUsers('expired')" class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-all border-2 border-transparent hover:border-red-300" id="expired-users-card">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                    <i data-feather="user-x" class="w-8 h-8"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Expired Users</h3>
+                    <p class="text-2xl font-bold text-red-600" id="expired-users-count">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a href="/register" class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-colors">
+                <div class="p-2 rounded-full bg-indigo-100 text-indigo-600">
+                    <i data-feather="user-plus" class="w-6 h-6"></i>
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium text-gray-800">Register New User</h4>
+                    <p class="text-sm text-gray-600">Add new members to the fitness studio</p>
+                </div>
+            </a>
+
+            <a href="#" class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors">
+                <div class="p-2 rounded-full bg-green-100 text-green-600">
+                    <i data-feather="bar-chart-2" class="w-6 h-6"></i>
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium text-gray-800">View Analytics</h4>
+                    <p class="text-sm text-gray-600">Check studio performance metrics</p>
+                </div>
+            </a>
+
+            <a href="/update-user-details" class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors">
+                <div class="p-2 rounded-full bg-purple-100 text-purple-600">
+                    <i data-feather="user-edit" class="w-6 h-6"></i>
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium text-gray-800">Update User Details</h4>
+                    <p class="text-sm text-gray-600">Modify user passwords, subscriptions, and device IDs</p>
+                </div>
+            </a>
+
+            <a href="#" class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50 transition-colors">
+                <div class="p-2 rounded-full bg-red-100 text-red-600">
+                    <i data-feather="file-text" class="w-6 h-6"></i>
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-medium text-gray-800">Generate Reports</h4>
+                    <p class="text-sm text-gray-600">Create membership reports</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Users Table Section -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-gray-800" id="table-title">Total Users</h3>
+            <div class="flex items-center space-x-4">
+                <!-- Search -->
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Search users..." 
+                           class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
+                    <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <!-- Sort -->
+                <select id="sortSelect" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
+                    <option value="username">Sort by Username</option>
+                    <option value="sub_end_date">Sort by Expiry Date</option>
+                    <option value="sub_start_date">Sort by Start Date</option>
+                    <option value="phone_no">Sort by Phone</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3">Image</th>
+                        <th class="px-6 py-3">Username</th>
+                        <th class="px-6 py-3">Phone No</th>
+                        <th class="px-6 py-3">Start Date</th>
+                        <th class="px-6 py-3">End Date</th>
+                        <th class="px-6 py-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            <i data-feather="users" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
+                            <p>No users found</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between mt-6">
+            <div class="text-sm text-gray-700">
+                Showing <span id="startIndex">0</span> to <span id="endIndex">0</span> of <span id="totalItems">0</span> results
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="prevBtn" onclick="previousPage()" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Previous
+                </button>
+                <span id="pageInfo" class="px-3 py-2 text-sm text-gray-700">Page 1 of 1</span>
+                <button id="nextBtn" onclick="nextPage()" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Registration Requests -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">Pending Registration Requests</h3>
+            <button onclick="refreshRequests()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+                <i data-feather="refresh-cw" class="w-4 h-4 inline mr-2"></i>Refresh
+            </button>
+        </div>
+        <div id="pendingRequests" class="space-y-4">
+            <div class="text-center text-gray-500 py-8">
+                <i data-feather="inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300"></i>
+                <p>No pending requests</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h3>
+        <div class="space-y-4">
+            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                <div class="p-2 rounded-full bg-blue-100 text-blue-600">
+                    <i data-feather="info" class="w-5 h-5"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm text-gray-600">Welcome to your admin dashboard! Start by registering new users.</p>
+                    <p class="text-xs text-gray-500">Just now</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global variables
+    let currentFilter = 'total';
+    let currentPage = 1;
+    let usersPerPage = 10;
+    let allUsers = [];
+    let filteredUsers = [];
+    let totalPages = 1;
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        feather.replace();
+        loadDashboardData();
+        loadPendingRequests();
+        
+        // Add event listeners
+        document.getElementById('searchInput').addEventListener('input', handleSearch);
+        document.getElementById('sortSelect').addEventListener('change', handleSort);
+    });
+
+    // Load dashboard data
+    async function loadDashboardData() {
+        try {
+            const response = await fetch('/api/dashboard-stats', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                updateStats(data);
+                loadUsers();
+            }
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+        }
+    }
+
+    // Update statistics
+    function updateStats(data) {
+        document.getElementById('total-users-count').textContent = data.total_users || 0;
+        document.getElementById('active-users-count').textContent = data.active_users || 0;
+        document.getElementById('expiring-users-count').textContent = data.expiring_users || 0;
+        document.getElementById('expired-users-count').textContent = data.expired_users || 0;
+    }
+
+    // Load users
+    async function loadUsers() {
+        try {
+            const response = await fetch('/api/users', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                allUsers = data.users || [];
+                filterUsers(currentFilter);
+            }
+        } catch (error) {
+            console.error('Error loading users:', error);
+        }
+    }
+
+    // Filter users based on selection
+    function filterUsers(filter) {
+        currentFilter = filter;
+        currentPage = 1;
+        
+        // Update active card styling
+        document.querySelectorAll('[id$="-users-card"]').forEach(card => {
+            card.classList.remove('border-blue-300', 'border-green-300', 'border-orange-300', 'border-red-300');
+        });
+        
+        if (filter === 'total') {
+            filteredUsers = [...allUsers];
+            document.getElementById('total-users-card').classList.add('border-blue-300');
+            document.getElementById('table-title').textContent = 'Total Users';
+        } else if (filter === 'active') {
+            filteredUsers = allUsers.filter(user => {
+                if (!user.sub_end_date) return false;
+                const endDate = new Date(user.sub_end_date);
+                const today = new Date();
+                return endDate > today;
+            });
+            document.getElementById('active-users-card').classList.add('border-green-300');
+            document.getElementById('table-title').textContent = 'Active Users';
+        } else if (filter === 'expiring') {
+            filteredUsers = allUsers.filter(user => {
+                if (!user.sub_end_date) return false;
+                const endDate = new Date(user.sub_end_date);
+                const today = new Date();
+                const daysUntilExpiry = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+                return daysUntilExpiry <= 7 && daysUntilExpiry >= 0;
+            });
+            document.getElementById('expiring-users-card').classList.add('border-orange-300');
+            document.getElementById('table-title').textContent = 'Expiring Soon (7 days)';
+        } else if (filter === 'expired') {
+            filteredUsers = allUsers.filter(user => {
+                if (!user.sub_end_date) return false;
+                const endDate = new Date(user.sub_end_date);
+                const today = new Date();
+                return endDate < today;
+            });
+            document.getElementById('expired-users-card').classList.add('border-red-300');
+            document.getElementById('table-title').textContent = 'Expired Users';
+        }
+        
+        displayUsers();
+    }
+
+    // Display users with pagination
+    function displayUsers() {
+        const startIndex = (currentPage - 1) * usersPerPage;
+        const endIndex = startIndex + usersPerPage;
+        const pageUsers = filteredUsers.slice(startIndex, endIndex);
+        
+        totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+        
+        // Update table body
+        const tbody = document.getElementById('usersTableBody');
+        
+        if (pageUsers.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                        <i data-feather="users" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
+                        <p>No users found</p>
+                    </td>
+                </tr>
+            `;
+        } else {
+            tbody.innerHTML = pageUsers.map(user => `
+                <tr class="bg-white border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                            ${user.profile_img ? 
+                                `<img src="data:image/jpeg;base64,${user.profile_img}" class="w-12 h-12 rounded-full object-cover">` : 
+                                `<i data-feather="user" class="w-6 h-6 text-gray-400"></i>`
+                            }
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 font-medium text-gray-900">${user.username}</td>
+                    <td class="px-6 py-4 text-gray-500">${user.phone_no || 'N/A'}</td>
+                    <td class="px-6 py-4 text-gray-500">${user.sub_start_date || 'N/A'}</td>
+                    <td class="px-6 py-4 text-gray-500">${user.sub_end_date || 'N/A'}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${
+                            user.sub_end_date && new Date(user.sub_end_date) > new Date() ? 
+                            'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }">
+                            ${user.sub_end_date && new Date(user.sub_end_date) > new Date() ? 'Active' : 'Expired'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Update pagination info
+        updatePaginationInfo(startIndex, endIndex, filteredUsers.length);
+        
+        // Reinitialize feather icons
+        feather.replace();
+    }
+
+    // Update pagination information
+    function updatePaginationInfo(startIndex, endIndex, totalItems) {
+        document.getElementById('startIndex').textContent = startIndex + 1;
+        document.getElementById('endIndex').textContent = Math.min(endIndex, totalItems);
+        document.getElementById('totalItems').textContent = totalItems;
+        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+        
+        // Update button states
+        document.getElementById('prevBtn').disabled = currentPage === 1;
+        document.getElementById('nextBtn').disabled = currentPage === totalPages;
+    }
+
+    // Navigation functions
+    function previousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            displayUsers();
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayUsers();
+        }
+    }
+
+    // Search functionality
+    function handleSearch() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        
+        if (searchTerm === '') {
+            filterUsers(currentFilter);
+        } else {
+            filteredUsers = allUsers.filter(user => 
+                user.username.toLowerCase().includes(searchTerm) ||
+                (user.phone_no && user.phone_no.includes(searchTerm))
+            );
+            currentPage = 1;
+            displayUsers();
+        }
+    }
+
+    // Sort functionality
+    function handleSort() {
+        const sortBy = document.getElementById('sortSelect').value;
+        
+        filteredUsers.sort((a, b) => {
+            let aVal = a[sortBy] || '';
+            let bVal = b[sortBy] || '';
+            
+            if (sortBy.includes('date')) {
+                aVal = aVal ? new Date(aVal) : new Date(0);
+                bVal = bVal ? new Date(bVal) : new Date(0);
+            }
+            
+            if (aVal < bVal) return -1;
+            if (aVal > bVal) return 1;
+            return 0;
+        });
+        
+        currentPage = 1;
+        displayUsers();
+    }
+
+    // Pending requests functions (existing code)
+    async function loadPendingRequests() {
+        try {
+            const response = await fetch('/api/pending-requests', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                displayPendingRequests(data.requests || []);
+            }
+        } catch (error) {
+            console.error('Error loading requests:', error);
+        }
+    }
+
+    function displayPendingRequests(requests) {
+        const container = document.getElementById('pendingRequests');
+        
+        if (requests.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-gray-500 py-8">
+                    <i data-feather="inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300"></i>
+                    <p>No pending requests</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = requests.map(request => `
+            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <h4 class="font-medium text-gray-800">${request.username}</h4>
+                            <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                                ${request.preferred_role}
+                            </span>
+                            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                ${request.status}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                            <div>
+                                <span class="font-medium">Phone:</span> ${request.phone_no}
+                            </div>
+                            <div>
+                                <span class="font-medium">Email:</span> ${request.email_id}
+                            </div>
+                            <div>
+                                <span class="font-medium">Gender:</span> ${request.gender}
+                            </div>
+                            <div>
+                                <span class="font-medium">Date of Birth:</span> ${request.dob}
+                            </div>
+                            <div>
+                                <span class="font-medium">Height:</span> ${request.height ? request.height + ' cm' : 'N/A'}
+                            </div>
+                            <div>
+                                <span class="font-medium">Weight:</span> ${request.weight ? request.weight + ' kg' : 'N/A'}
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <span class="font-medium">Message:</span>
+                            <p class="text-gray-600 mt-1">${request.message}</p>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-2">
+                            Requested on: ${new Date(request.created_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div class="flex space-x-2 ml-4">
+                        <button onclick="approveRequest('${request.registration_id}')" 
+                                class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded transition-colors">
+                            Approve
+                        </button>
+                        <button onclick="rejectRequest('${request.registration_id}')" 
+                                class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors">
+                            Reject
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        feather.replace();
+    }
+
+    function refreshRequests() {
+        loadPendingRequests();
+    }
+
+    async function approveRequest(registrationId) {
+        if (confirm('Are you sure you want to approve this registration request? This will create a user account.')) {
+            try {
+                const response = await fetch(`/api/approve-request/${registrationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        // Show success message with account details
+                        alert(`✅ ${result.message}\n\nAccount Details:\nUsername: ${result.username}\nTemporary Password: ${result.temp_password}\n\nPlease share these credentials with the user.`);
+                        
+                        // Refresh the requests and dashboard data
+                        loadPendingRequests();
+                        loadDashboardData();
+                    } else {
+                        alert(`❌ Error: ${result.message}`);
+                    }
+                } else {
+                    alert('❌ Failed to approve request. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error approving request:', error);
+                alert('❌ Network error occurred. Please try again.');
+            }
+        }
+    }
+
+    async function rejectRequest(registrationId) {
+        const reason = prompt('Please provide a reason for rejection:');
+        if (reason) {
+            try {
+                const response = await fetch(`/api/reject-request/${registrationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason })
+                });
+                
+                if (response.ok) {
+                    loadPendingRequests();
+                }
+            } catch (error) {
+                console.error('Error rejecting request:', error);
+            }
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Admin Header -->
+    <header class="bg-indigo-600 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="admin-username" class="text-lg"></span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Admin Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-auto">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 Pub Fitness Studio. Admin Panel.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Check if admin token exists
+        function checkAdminAuth() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+            
+            // Decode token to get username
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                document.getElementById('admin-username').textContent = `Welcome, ${payload.username}`;
+            } catch (e) {
+                console.error('Invalid token');
+                localStorage.removeItem('adminToken');
+                window.location.href = '/login';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            window.location.href = '/login';
+        }
+
+        // Check auth on page load
+        document.addEventListener('DOMContentLoaded', checkAdminAuth);
+    </script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+{% extends "user_base.html" %}
+
+{% block title %}Nutrition Calculator{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Nutrition Calculator</h2>
+    <p class="text-gray-600 mb-6">Track your daily nutrition intake by selecting foods from each meal category.</p>
+    
+    <form id="nutritionForm" class="space-y-6">
+        <!-- Date Selection -->
+        <div class="mb-4">
+            <label for="date" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+            <input type="date" id="date" name="date" required 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   value="{{ today_date }}">
+        </div>
+
+        <!-- Breakfast Section -->
+        <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-gray-800 mb-3">Breakfast</h3>
+            <div class="mb-3">
+                <input type="text" id="breakfastInput" placeholder="Search for breakfast foods..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       list="breakfastFoods">
+                <datalist id="breakfastFoods">
+                    <!-- Will be populated by JavaScript -->
+                </datalist>
+            </div>
+            <div id="breakfastItems" class="space-y-2">
+                <!-- Selected breakfast items will appear here -->
+            </div>
+            <div id="breakfastNutrition" class="mt-3 p-3 bg-gray-50 rounded-md hidden">
+                <h4 class="font-medium text-gray-700 mb-2">Breakfast Nutrition Summary:</h4>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div>Calories: <span id="breakfastCalories">0</span> kcal</div>
+                    <div>Carbs: <span id="breakfastCarbs">0</span>g</div>
+                    <div>Protein: <span id="breakfastProtein">0</span>g</div>
+                    <div>Fat: <span id="breakfastFat">0</span>g</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lunch Section -->
+        <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-gray-800 mb-3">Lunch</h3>
+            <div class="mb-3">
+                <input type="text" id="lunchInput" placeholder="Search for lunch foods..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       list="lunchFoods">
+                <datalist id="lunchFoods">
+                    <!-- Will be populated by JavaScript -->
+                </datalist>
+            </div>
+            <div id="lunchItems" class="space-y-2">
+                <!-- Selected lunch items will appear here -->
+            </div>
+            <div id="lunchNutrition" class="mt-3 p-3 bg-gray-50 rounded-md hidden">
+                <h4 class="font-medium text-gray-700 mb-2">Lunch Nutrition Summary:</h4>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div>Calories: <span id="lunchCalories">0</span> kcal</div>
+                    <div>Carbs: <span id="lunchCarbs">0</span>g</div>
+                    <div>Protein: <span id="lunchProtein">0</span>g</div>
+                    <div>Fat: <span id="lunchFat">0</span>g</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snacks Section -->
+        <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-gray-800 mb-3">Snacks</h3>
+            <div class="mb-3">
+                <input type="text" id="snacksInput" placeholder="Search for snack foods..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       list="snacksFoods">
+                <datalist id="snacksFoods">
+                    <!-- Will be populated by JavaScript -->
+                </datalist>
+            </div>
+            <div id="snacksItems" class="space-y-2">
+                <!-- Selected snack items will appear here -->
+            </div>
+            <div id="snacksNutrition" class="mt-3 p-3 bg-gray-50 rounded-md hidden">
+                <h4 class="font-medium text-gray-700 mb-2">Snacks Nutrition Summary:</h4>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div>Calories: <span id="snacksCalories">0</span> kcal</div>
+                    <div>Carbs: <span id="snacksCarbs">0</span>g</div>
+                    <div>Protein: <span id="snacksProtein">0</span>g</div>
+                    <div>Fat: <span id="snacksFat">0</span>g</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dinner Section -->
+        <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-gray-800 mb-3">Dinner</h3>
+            <div class="mb-3">
+                <input type="text" id="dinnerInput" placeholder="Search for dinner foods..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       list="dinnerFoods">
+                <datalist id="dinnerFoods">
+                    <!-- Will be populated by JavaScript -->
+                </datalist>
+            </div>
+            <div id="dinnerItems" class="space-y-2">
+                <!-- Selected dinner items will appear here -->
+            </div>
+            <div id="dinnerNutrition" class="mt-3 p-3 bg-gray-50 rounded-md hidden">
+                <h4 class="font-medium text-gray-700 mb-2">Dinner Nutrition Summary:</h4>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div>Calories: <span id="dinnerCalories">0</span> kcal</div>
+                    <div>Carbs: <span id="dinnerCarbs">0</span>g</div>
+                    <div>Protein: <span id="dinnerProtein">0</span>g</div>
+                    <div>Fat: <span id="dinnerFat">0</span>g</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Water Consumption -->
+        <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-gray-800 mb-3">Water Consumption</h3>
+            <div class="mb-3">
+                <label for="waterInput" class="block text-sm font-medium text-gray-700 mb-2">Water (liters)</label>
+                <input type="number" id="waterInput" name="water" step="0.1" min="0" max="10" 
+                       placeholder="Enter water consumption in liters" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <!-- Total Nutrition Summary -->
+        <div class="border border-gray-200 rounded-lg p-4 bg-blue-50">
+            <h3 class="text-lg font-medium text-gray-800 mb-3">Daily Nutrition Summary</h3>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="text-center p-3 bg-white rounded-md">
+                    <div class="text-2xl font-bold text-blue-600" id="totalCalories">0</div>
+                    <div class="text-gray-600">Total Calories</div>
+                </div>
+                <div class="text-center p-3 bg-white rounded-md">
+                    <div class="text-2xl font-bold text-green-600" id="totalCarbs">0</div>
+                    <div class="text-gray-600">Total Carbs (g)</div>
+                </div>
+                <div class="text-center p-3 bg-white rounded-md">
+                    <div class="text-2xl font-bold text-purple-600" id="totalProtein">0</div>
+                    <div class="text-gray-600">Total Protein (g)</div>
+                </div>
+                <div class="text-center p-3 bg-white rounded-md">
+                    <div class="text-2xl font-bold text-orange-600" id="totalFat">0</div>
+                    <div class="text-gray-600">Total Fat (g)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-center">
+            <button type="submit" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200">
+                Save Nutrition Data
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Success/Error Messages -->
+<div id="messageContainer" class="fixed top-4 right-4 z-50 hidden">
+    <div id="messageContent" class="p-4 rounded-lg shadow-lg max-w-sm">
+        <div class="flex items-center">
+            <span id="messageIcon" class="mr-3"></span>
+            <span id="messageText"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global variables
+    let foodData = [];
+    let selectedItems = {
+        breakfast: [],
+        lunch: [],
+        snacks: [],
+        dinner: []
+    };
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFoodData();
+        setupEventListeners();
+        setTodayDate();
+    });
+
+    // Set today's date as default
+    function setTodayDate() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+    }
+
+    // Load food data from CSV
+    async function loadFoodData() {
+        try {
+            const response = await fetch('/static/data.csv');
+            const csvText = await response.text();
+            foodData = parseCSV(csvText);
+            populateDatalists();
+        } catch (error) {
+            console.error('Error loading food data:', error);
+            showMessage('Error loading food data', 'error');
+        }
+    }
+
+    // Parse CSV data
+    function parseCSV(csvText) {
+        const lines = csvText.split('\n');
+        const headers = lines[0].split(',');
+        const data = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            if (lines[i].trim()) {
+                const values = lines[i].split(',');
+                const item = {};
+                headers.forEach((header, index) => {
+                    item[header.trim()] = values[index] ? values[index].trim() : '';
+                });
+                data.push(item);
+            }
+        }
+        
+        return data;
+    }
+
+    // Populate datalists
+    function populateDatalists() {
+        const categories = ['breakfast', 'lunch', 'snacks', 'dinner'];
+        
+        categories.forEach(category => {
+            const datalist = document.getElementById(category + 'Foods');
+            const input = document.getElementById(category + 'Input');
+            
+            // Clear existing options
+            datalist.innerHTML = '';
+            
+            // Add food options
+            foodData.forEach(food => {
+                if (food.food_name && food.servings_unit) {
+                    const option = document.createElement('option');
+                    option.value = `${food.food_name} (${food.servings_unit})`;
+                    option.dataset.foodName = food.food_name;
+                    option.dataset.servingUnit = food.servings_unit;
+                    option.dataset.calories = food.unit_serving_energy_kcal || '0';
+                    option.dataset.carbs = food.unit_serving_carb_g || '0';
+                    option.dataset.protein = food.unit_serving_protein_g || '0';
+                    option.dataset.fat = food.unit_serving_fat_g || '0';
+                    datalist.appendChild(option);
+                }
+            });
+        });
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+        const categories = ['breakfast', 'lunch', 'snacks', 'dinner'];
+        
+        categories.forEach(category => {
+            const input = document.getElementById(category + 'Input');
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addFoodItem(category);
+                }
+            });
+        });
+
+        // Form submission
+        document.getElementById('nutritionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveNutritionData();
+        });
+    }
+
+    // Add food item to selected items
+    function addFoodItem(category) {
+        const input = document.getElementById(category + 'Input');
+        const value = input.value.trim();
+        
+        if (!value) return;
+        
+        // Find the food item
+        const foodItem = foodData.find(food => 
+            `${food.food_name} (${food.servings_unit})` === value
+        );
+        
+        if (foodItem) {
+            const item = {
+                name: foodItem.food_name,
+                servingUnit: foodItem.servings_unit,
+                calories: parseFloat(foodItem.unit_serving_energy_kcal) || 0,
+                carbs: parseFloat(foodItem.unit_serving_carb_g) || 0,
+                protein: parseFloat(foodItem.unit_serving_protein_g) || 0,
+                fat: parseFloat(foodItem.unit_serving_fat_g) || 0
+            };
+            
+            selectedItems[category].push(item);
+            displaySelectedItems(category);
+            updateNutritionSummary();
+            input.value = '';
+        }
+    }
+
+    // Display selected items for a category
+    function displaySelectedItems(category) {
+        const container = document.getElementById(category + 'Items');
+        const nutritionDiv = document.getElementById(category + 'Nutrition');
+        
+        if (selectedItems[category].length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-sm">No items selected</p>';
+            nutritionDiv.classList.add('hidden');
+            return;
+        }
+        
+        let html = '';
+        selectedItems[category].forEach((item, index) => {
+            html += `
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-800">${item.name}</div>
+                        <div class="text-sm text-gray-600">
+                            ${item.calories} kcal | ${item.carbs}g carbs | ${item.protein}g protein | ${item.fat}g fat
+                        </div>
+                    </div>
+                    <button onclick="removeFoodItem('${category}', ${index})" 
+                            class="ml-2 px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+                        Remove
+                    </button>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        nutritionDiv.classList.remove('hidden');
+    }
+
+    // Remove food item
+    function removeFoodItem(category, index) {
+        selectedItems[category].splice(index, 1);
+        displaySelectedItems(category);
+        updateNutritionSummary();
+    }
+
+    // Update nutrition summary
+    function updateNutritionSummary() {
+        const categories = ['breakfast', 'lunch', 'snacks', 'dinner'];
+        let totalCalories = 0, totalCarbs = 0, totalProtein = 0, totalFat = 0;
+        
+        categories.forEach(category => {
+            let categoryCalories = 0, categoryCarbs = 0, categoryProtein = 0, categoryFat = 0;
+            
+            selectedItems[category].forEach(item => {
+                categoryCalories += item.calories;
+                categoryCarbs += item.carbs;
+                categoryProtein += item.protein;
+                categoryFat += item.fat;
+            });
+            
+            // Update category nutrition display
+            document.getElementById(category + 'Calories').textContent = categoryCalories.toFixed(1);
+            document.getElementById(category + 'Carbs').textContent = categoryCarbs.toFixed(1);
+            document.getElementById(category + 'Protein').textContent = categoryProtein.toFixed(1);
+            document.getElementById(category + 'Fat').textContent = categoryFat.toFixed(1);
+            
+            totalCalories += categoryCalories;
+            totalCarbs += categoryCarbs;
+            totalProtein += categoryProtein;
+            totalFat += categoryFat;
+        });
+        
+        // Update total nutrition display
+        document.getElementById('totalCalories').textContent = totalCalories.toFixed(1);
+        document.getElementById('totalCarbs').textContent = totalCarbs.toFixed(1);
+        document.getElementById('totalProtein').textContent = totalProtein.toFixed(1);
+        document.getElementById('totalFat').textContent = totalFat.toFixed(1);
+    }
+
+    // Save nutrition data
+    async function saveNutritionData() {
+        const token = localStorage.getItem('userToken');
+        if (!token) {
+            showMessage('Please log in to save data', 'error');
+            return;
+        }
+
+        const date = document.getElementById('date').value;
+        const water = parseFloat(document.getElementById('waterInput').value) || 0;
+        
+        // Prepare data for submission
+        const nutritionData = {
+            date: date,
+            breakfast: selectedItems.breakfast.map(item => item.name).join(', '),
+            lunch: selectedItems.lunch.map(item => item.name).join(', '),
+            snacks: selectedItems.snacks.map(item => item.name).join(', '),
+            dinner: selectedItems.dinner.map(item => item.name).join(', '),
+            calories: parseFloat(document.getElementById('totalCalories').textContent),
+            carbs: parseFloat(document.getElementById('totalCarbs').textContent),
+            proteins: parseFloat(document.getElementById('totalProtein').textContent),
+            fats: parseFloat(document.getElementById('totalFat').textContent),
+            water: water
+        };
+
+        try {
+            const response = await fetch('/api/nutrition-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(nutritionData)
+            });
+
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                showMessage('Nutrition data saved successfully!', 'success');
+                // Reset form after successful save
+                resetForm();
+            } else {
+                showMessage(result.message || 'Failed to save data', 'error');
+            }
+        } catch (error) {
+            console.error('Error saving nutrition data:', error);
+            showMessage('Error saving data. Please try again.', 'error');
+        }
+    }
+
+    // Reset form
+    function resetForm() {
+        selectedItems = {
+            breakfast: [],
+            lunch: [],
+            snacks: [],
+            dinner: []
+        };
+        
+        const categories = ['breakfast', 'lunch', 'snacks', 'dinner'];
+        categories.forEach(category => {
+            document.getElementById(category + 'Input').value = '';
+            displaySelectedItems(category);
+        });
+        
+        document.getElementById('waterInput').value = '';
+        updateNutritionSummary();
+    }
+
+    // Show message
+    function showMessage(message, type) {
+        const container = document.getElementById('messageContainer');
+        const content = document.getElementById('messageContent');
+        const icon = document.getElementById('messageIcon');
+        const text = document.getElementById('messageText');
+        
+        // Set message content
+        text.textContent = message;
+        
+        // Set styling based on type
+        if (type === 'success') {
+            content.className = 'p-4 rounded-lg shadow-lg max-w-sm bg-green-500 text-white';
+            icon.innerHTML = '✅';
+        } else {
+            content.className = 'p-4 rounded-lg shadow-lg max-w-sm bg-red-500 text-white';
+            icon.innerHTML = '❌';
+        }
+        
+        // Show message
+        container.classList.remove('hidden');
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            container.classList.add('hidden');
+        }, 3000);
+    }
+</script>
+{% endblock %}

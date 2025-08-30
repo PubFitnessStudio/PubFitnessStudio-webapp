@@ -1,0 +1,308 @@
+{% extends "user_base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6">
+    <!-- Calendar Navigation -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold text-gray-800">Nutrition Tracker</h2>
+            <div class="flex items-center space-x-4">
+                <button onclick="previousDay()" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                    <i data-feather="chevron-left" class="w-5 h-5 text-gray-600"></i>
+                </button>
+                <span id="current-date" class="text-lg font-semibold text-gray-700"></span>
+                <button onclick="nextDay()" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                    <i data-feather="chevron-right" class="w-5 h-5 text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Date Display -->
+        <div class="text-center">
+            <p class="text-sm text-gray-500 mb-2">Selected Date</p>
+            <p id="selected-date" class="text-3xl font-bold text-blue-600"></p>
+        </div>
+    </div>
+
+    <!-- Nutrition Goals Progress -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Calories -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Calories</h3>
+                <span class="text-sm text-gray-500">
+                    <span id="calories-consumed">0</span> / <span id="calories-goal">0</span>
+                </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="calories-progress" class="bg-blue-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">
+                <span id="calories-percentage">0%</span> of daily goal
+            </p>
+        </div>
+
+        <!-- Proteins -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Proteins</h3>
+                <span class="text-sm text-gray-500">
+                    <span id="proteins-consumed">0</span> / <span id="proteins-goal">0</span>g
+                </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="proteins-progress" class="bg-green-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">
+                <span id="proteins-percentage">0%</span> of daily goal
+            </p>
+        </div>
+
+        <!-- Fats -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Fats</h3>
+                <span class="text-sm text-gray-500">
+                    <span id="fats-consumed">0</span> / <span id="fats-goal">0</span>g
+                </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="fats-progress" class="bg-yellow-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">
+                <span id="fats-percentage">0%</span> of daily goal
+            </p>
+        </div>
+
+        <!-- Carbs -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Carbohydrates</h3>
+                <span class="text-sm text-gray-500">
+                    <span id="carbs-consumed">0</span> / <span id="carbs-goal">0</span>g
+                </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="carbs-progress" class="bg-purple-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">
+                <span id="carbs-percentage">0%</span> of daily goal
+            </p>
+        </div>
+    </div>
+
+    <!-- Daily Nutrition Log -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Nutrition Log</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Breakfast -->
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2">Breakfast</h4>
+                <textarea id="breakfast-input" placeholder="What did you have for breakfast?" 
+                          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="3" disabled></textarea>
+            </div>
+
+            <!-- Lunch -->
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2">Lunch</h4>
+                <textarea id="lunch-input" placeholder="What did you have for lunch?" 
+                          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="3" disabled></textarea>
+            </div>
+
+            <!-- Snacks -->
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2">Snacks</h4>
+                <textarea id="snacks-input" placeholder="Any snacks today?" 
+                          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="3" disabled></textarea>
+            </div>
+
+            <!-- Dinner -->
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2">Dinner</h4>
+                <textarea id="dinner-input" placeholder="What did you have for dinner?" 
+                          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="3" disabled></textarea>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <!--
+        <div class="mt-6 text-center">
+            <button onclick="saveNutritionData()" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                Save Daily Log
+            </button>
+        </div>
+        -->
+    </div>
+</div>
+
+<script>
+let currentDate = new Date();
+let userGoals = {};
+let nutritionData = {};
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserGoals();
+    updateDateDisplay();
+    loadNutritionData();
+});
+
+// Load user nutrition goals
+async function loadUserGoals() {
+    try {
+        const response = await fetch('/api/user-goals', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            userGoals = data.goals;
+            updateProgressBars();
+        }
+    } catch (error) {
+        console.error('Error loading user goals:', error);
+    }
+}
+
+// Load nutrition data for selected date
+async function loadNutritionData() {
+    try {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        const response = await fetch(`/api/nutrition-data/${dateStr}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            nutritionData = data.nutrition_data || {};
+            populateNutritionInputs();
+            updateProgressBars();
+        }
+    } catch (error) {
+        console.error('Error loading nutrition data:', error);
+    }
+}
+
+// Update date display
+function updateDateDisplay() {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('current-date').textContent = currentDate.toLocaleDateString('en-US', options);
+    document.getElementById('selected-date').textContent = currentDate.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+    });
+}
+
+// Navigate to previous day
+function previousDay() {
+    currentDate.setDate(currentDate.getDate() - 1);
+    updateDateDisplay();
+    loadNutritionData();
+}
+
+// Navigate to next day
+function nextDay() {
+    currentDate.setDate(currentDate.getDate() + 1);
+    updateDateDisplay();
+    loadNutritionData();
+}
+
+// Populate nutrition input fields
+function populateNutritionInputs() {
+    document.getElementById('breakfast-input').value = nutritionData.breakfast || '';
+    document.getElementById('lunch-input').value = nutritionData.lunch || '';
+    document.getElementById('snacks-input').value = nutritionData.snacks || '';
+    document.getElementById('dinner-input').value = nutritionData.dinner || '';
+}
+
+// Update progress bars
+function updateProgressBars() {
+    // Calories
+    const caloriesConsumed = nutritionData.calories || 0;
+    const caloriesGoal = userGoals.calories_goal || 0;
+    const caloriesPercentage = caloriesGoal > 0 ? Math.min((caloriesConsumed / caloriesGoal) * 100, 100) : 0;
+    
+    document.getElementById('calories-consumed').textContent = caloriesConsumed;
+    document.getElementById('calories-goal').textContent = caloriesGoal;
+    document.getElementById('calories-progress').style.width = `${caloriesPercentage}%`;
+    document.getElementById('calories-percentage').textContent = `${Math.round(caloriesPercentage)}%`;
+
+    // Proteins
+    const proteinsConsumed = nutritionData.proteins || 0;
+    const proteinsGoal = userGoals.proteins_goal || 0;
+    const proteinsPercentage = proteinsGoal > 0 ? Math.min((proteinsConsumed / proteinsGoal) * 100, 100) : 0;
+    
+    document.getElementById('proteins-consumed').textContent = proteinsConsumed;
+    document.getElementById('proteins-goal').textContent = proteinsGoal;
+    document.getElementById('proteins-progress').style.width = `${proteinsPercentage}%`;
+    document.getElementById('proteins-percentage').textContent = `${Math.round(proteinsPercentage)}%`;
+
+    // Fats
+    const fatsConsumed = nutritionData.fats || 0;
+    const fatsGoal = userGoals.fats_goal || 0;
+    const fatsPercentage = fatsGoal > 0 ? Math.min((fatsConsumed / fatsGoal) * 100, 100) : 0;
+    
+    document.getElementById('fats-consumed').textContent = fatsConsumed;
+    document.getElementById('fats-goal').textContent = fatsGoal;
+    document.getElementById('fats-progress').style.width = `${fatsPercentage}%`;
+    document.getElementById('fats-percentage').textContent = `${Math.round(fatsPercentage)}%`;
+
+    // Carbs
+    const carbsConsumed = nutritionData.carbs || 0;
+    const carbsGoal = userGoals.carbs_goal || 0;
+    const carbsPercentage = carbsGoal > 0 ? Math.min((carbsConsumed / carbsGoal) * 100, 100) : 0;
+    
+    document.getElementById('carbs-consumed').textContent = carbsConsumed;
+    document.getElementById('carbs-goal').textContent = carbsGoal;
+    document.getElementById('carbs-progress').style.width = `${carbsPercentage}%`;
+    document.getElementById('carbs-percentage').textContent = `${Math.round(carbsPercentage)}%`;
+}
+
+// Save nutrition data
+async function saveNutritionData() {
+    try {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        const nutritionData = {
+            date: dateStr,
+            breakfast: document.getElementById('breakfast-input').value,
+            lunch: document.getElementById('lunch-input').value,
+            snacks: document.getElementById('snacks-input').value,
+            dinner: document.getElementById('dinner-input').value
+        };
+
+        const response = await fetch('/api/nutrition-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+            },
+            body: JSON.stringify(nutritionData)
+        });
+
+        if (response.ok) {
+            alert('Nutrition data saved successfully!');
+            loadNutritionData(); // Reload to update progress bars
+        } else {
+            const error = await response.json();
+            alert(`Error saving data: ${error.message}`);
+        }
+    } catch (error) {
+        console.error('Error saving nutrition data:', error);
+        alert('Error saving data. Please try again.');
+    }
+}
+
+// Initialize Feather icons
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+});
+</script>
+{% endblock %}
